@@ -7,7 +7,7 @@ on:
 
 env:
   IMAGE_NAME: azure-voting-app-redis
-  RESOURCE_NAME: meetup20201119
+  RESOURCE_NAME: meetup202011192
   RESOURCE_GROUP: meetup-rg
 
 jobs:
@@ -68,3 +68,21 @@ jobs:
             az aks install-cli
             az aks get-credentials -g ${{ env.RESOURCE_GROUP }} -n ${{ env.RESOURCE_NAME }}
             kubectl apply -f aks.yaml
+
+  deploy_to_app_service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to App Service
+        uses: Azure/cli@v1.0.0
+        with:
+          inlineScript: |
+            cd templates
+            az appservice plan create --name ${{ env.RESOURCE_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --sku S1 --is-linux
+            az webapp create --resource-group ${{ env.RESOURCE_GROUP }} --plan ${{ env.RESOURCE_NAME }} --name ${{ env.RESOURCE_NAME }} --multicontainer-config-type compose --multicontainer-config-file webapp.yml
