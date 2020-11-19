@@ -48,7 +48,7 @@ jobs:
             az container delete -g meetup-rg -n meetup20201119 -y
             az container create -g meetup-rg -l eastus --file aci.yaml
 
-  deploy_to_acr:
+  deploy_to_aks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,5 +63,6 @@ jobs:
         with:
           inlineScript: |
             cd templates
+            az aks install-cli
             az aks get-credentials -g meetup-rg -n meetup20201119
             kubectl apply -f aks.yaml
