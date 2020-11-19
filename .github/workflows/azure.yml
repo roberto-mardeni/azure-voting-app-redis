@@ -1,0 +1,31 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - demo
+
+env:
+  IMAGE_NAME: azure-voting-app-redis
+  REGISTRY_NAME: meetup20201119
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push image
+        uses: Azure/cli@v1.0.0
+        with:
+          inlineScript: |
+            cd azure-vote
+            az acr build --image demo/${{ env.IMAGE_NAME }}:v$GITHUB_RUN_ID \
+            --registry ${{REGISTRY_NAME}} \
+            --file Dockerfile .
