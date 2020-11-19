@@ -7,6 +7,7 @@ on:
 
 env:
   IMAGE_NAME: azure-voting-app-redis
+  REGISTRY_NAME: meetup20201119
   RESOURCE_NAME: meetup202011192
   RESOURCE_GROUP: meetup-rg
 
@@ -28,7 +29,7 @@ jobs:
           inlineScript: |
             cd azure-vote
             az acr build --image demo/${{ env.IMAGE_NAME }}:latest \
-            --registry ${{ env.RESOURCE_NAME }} \
+            --registry ${{ env.REGISTRY_NAME }} \
             --file Dockerfile .
 
   deploy_to_aci:
@@ -64,7 +65,7 @@ jobs:
         with:
           inlineScript: |
             cd templates
-            az aks create --resource-group meetup_rg --name ${{ env.RESOURCE_NAME }} --node-count 1 --generate-ssh-keys
+            az aks create --resource-group meetup_rg --name ${{ env.RESOURCE_NAME }} --node-count 1 --generate-ssh-keys --attach-acr ${{ env.REGISTRY_NAME }}
             az aks install-cli
             az aks get-credentials -g ${{ env.RESOURCE_GROUP }} -n ${{ env.RESOURCE_NAME }}
             kubectl apply -f aks.yaml
