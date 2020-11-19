@@ -29,3 +29,39 @@ jobs:
             az acr build --image demo/${{ env.IMAGE_NAME }}:latest \
             --registry ${{ env.REGISTRY_NAME }} \
             --file Dockerfile .
+
+  deploy_to_aci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to ACI
+        uses: Azure/cli@v1.0.0
+        with:
+          inlineScript: |
+            cd templates
+            az container delete -g meetup-rg -n meetup20201119 -y
+            az container create -g meetup-rg -l eastus --file aci.yaml
+
+  deploy_to_acr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to ACI
+        uses: Azure/cli@v1.0.0
+        with:
+          inlineScript: |
+            cd templates
+            az aks get-credentials -g meetup-rg -n meetup20201119
+            kubectl apply -f aks.yaml
