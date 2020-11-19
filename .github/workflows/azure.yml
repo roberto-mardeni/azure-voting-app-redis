@@ -28,4 +28,4 @@ jobs:
             cd azure-vote
             az acr build --image demo/${{ env.IMAGE_NAME }}:latest \
             --registry ${{ env.REGISTRY_NAME }} \
-            --file Dockerfile-for-app-service .
+            --file Dockerfile .
