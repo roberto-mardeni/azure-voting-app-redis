@@ -27,5 +27,5 @@ jobs:
           inlineScript: |
             cd azure-vote
             az acr build --image demo/${{ env.IMAGE_NAME }}:v$GITHUB_RUN_ID \
-            --registry ${{REGISTRY_NAME}} \
+            --registry ${{ env.REGISTRY_NAME }} \
             --file Dockerfile .
